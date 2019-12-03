@@ -1,62 +1,112 @@
 import React, { Component } from 'react';
-import { VERIFY_USER } from '../Events'
+import { VERIFY_USER } from '../Events';
+import withFirebaseAuth from 'react-with-firebase-auth';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
 
-export default class LoginForm extends Component {
+const config = {
+	apiKey: 'AIzaSyBrC1cEI0DrFZ8yN7VIUn7LDkXhzI5XX2s',
+	authDomain: 'instakilogram-14d79.firebaseapp.com',
+	databaseURL: 'https://instakilogram-14d79.firebaseio.com',
+	projectId: 'instakilogram-14d79',
+	storageBucket: 'instakilogram-14d79.appspot.com',
+	messagingSenderId: '409839865244',
+	appId: '1:409839865244:web:775316685369be1e498c59',
+	measurementId: 'G-YW2M3SYNK7',
+};
+
+var firebaseApp = null;
+if (!firebase.apps.length) {
+	firebaseApp = firebase.initializeApp(config);
+}
+class LoginForm extends Component {
 	constructor(props) {
-	  super(props);
-	
-	  this.state = {
-	  	nickname:"",
-	  	error:""
-	  };
+		super(props);
+
+		this.state = {
+			nickname: '',
+			error: '',
+		};
 	}
 
-	setUser = ({user, isUser})=>{
-
-		if(isUser){
-			this.setError("User name taken")
-		}else{
-			this.setError("")
-			this.props.setUser(user)
+	setUser = ({ user, isUser }) => {
+		if (isUser) {
+			this.setError('User name taken');
+		} else {
+			this.setError('');
+			this.props.setUser(user);
 		}
-	}
+	};
 
-	handleSubmit = (e)=>{
-		e.preventDefault()
-		const { socket } = this.props
-		const { nickname } = this.state
-		socket.emit(VERIFY_USER, nickname, this.setUser)
-	}
+	handleSubmit = e => {
+		e.preventDefault();
+		const { socket } = this.props;
+		const { nickname } = this.state;
+		if (nickname) socket.emit(VERIFY_USER, nickname, this.setUser);
+	};
 
-	handleChange = (e)=>{
-		this.setState({nickname:e.target.value})
-	}
+	handleChange = e => {
+		this.setState({ nickname: e.target.value });
+	};
 
-	setError = (error)=>{
-		this.setState({error})
-	}
+	setError = error => {
+		this.setState({ error });
+	};
+	addUid = user => {
+		if (user) {
+			this.setState({ nickname: user.displayName });
+			const { socket } = this.props;
+			const { nickname } = this.state;
+			if (nickname) socket.emit(VERIFY_USER, nickname, this.setUser);
+		}
+	};
+	render() {
+		const { nickname, error } = this.state;
 
-	render() {	
-		const { nickname, error } = this.state
+		const { user, signOut, signInWithGoogle } = this.props;
 		return (
 			<div className="login">
-				<form onSubmit={this.handleSubmit} className="login-form" >
-
+				<form onSubmit={this.handleSubmit} className="login-form">
 					<label htmlFor="nickname">
 						<h2>Got a nickname?</h2>
 					</label>
-					<input
-						ref={(input)=>{ this.textInput = input }} 
+					{/* <input
+						ref={input => {
+							this.textInput = input;
+						}}
 						type="text"
 						id="nickname"
 						value={nickname}
 						onChange={this.handleChange}
 						placeholder={'Username'}
-						/>
-						<div className="error">{error ? error:null}</div>
+					/> */}
 
+					{user ? (
+						<p>
+							Hello, {user.displayName}
+							<button onClick={()=>{this.addUid(user)}}>Continue to Chat</button>
+						</p>
+					) : (
+						<p>Please sign in.</p>
+					)}
+					{user ? (
+						<button onClick={signOut}>Sign out</button>
+					) : (
+						<button onClick={signInWithGoogle}>Sign in with Google</button>
+					)}
+					<div className="error">{error ? error : null}</div>
 				</form>
 			</div>
 		);
 	}
 }
+
+const firebaseAppAuth = firebaseApp.auth();
+
+const providers = {
+	googleProvider: new firebase.auth.GoogleAuthProvider(),
+};
+export default withFirebaseAuth({
+	providers,
+	firebaseAppAuth,
+})(LoginForm);

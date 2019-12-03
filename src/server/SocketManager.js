@@ -2,13 +2,28 @@ const io = require('./index.js').io
 
 const { VERIFY_USER, USER_CONNECTED, USER_DISCONNECTED, 
 		LOGOUT, COMMUNITY_CHAT, MESSAGE_RECIEVED, MESSAGE_SENT,
-		TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER  } = require('../Events')
+		TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER, OLD_MESSAGE  } = require('../Events')
 
 const { createUser, createMessage, createChat } = require('../Factories')
 
 let connectedUsers = { }
 
 let communityChat = createChat({ isCommunity:true })
+var mysql = require('mysql');
+ 
+console.log('Get connection ...');
+ 
+var conn = mysql.createConnection({
+  database: 'chat',
+  host: "localhost",
+  user: "root",
+  password: ""
+});
+ 
+conn.connect(function(err) {
+  if (err) throw err;
+  console.log("SQL Connected!");
+});
 
 module.exports = function(socket){
 					
@@ -16,16 +31,77 @@ module.exports = function(socket){
 	console.log("Socket Id:" + socket.id);
 
 	let sendMessageToChatFromUser;
+	let sendMessageToChatFromOld;
 
 	let sendTypingFromUser;
 
+	
+	socket.on(OLD_MESSAGE, (active)=>{
+		console.log(active);
+		let sender = active.users[0];
+		let reciever = active.users[1];
+		let sql = `select * from connection where p1 = "${sender}" and p2="${reciever}" or p2 = "${sender}" and p1="${reciever}" `;
+		console.log(sql)
+		//let sql = `INSERT INTO connection value ('',"${sender}", "${reciever}","${newChat.id}","${recieverSocket}")`;
+		conn.query(sql, function(err, results) {
+			if (err) throw err;
+			if (results.length == 0 && !active.isCommunity){
+				sql = `insert connection value ('',"${sender}","${reciever}","${active.id}","${sender} connected with ${reciever}")`
+				conn.query(sql, function(err, results) {
+					if (err) throw err;
+				});
+			}
+			results.map((e) => {
+				let message = e.msg
+				let p1 = e.p1
+				// console.log(sender)
+				console.log(p1)
+				if(p1!==sender)
+				// console.log(e.msg )
+				io.emit(`${MESSAGE_RECIEVED}-${active.id}`, createMessage({message,p1}))
+				else
+				sendMessageToChatFromOld(active.id, message)
+				//sendMessageToChat(reciever);
+			});
+		});
+		 sql = `update connection set p1sid="${active.id}"  where p1 = "${sender}" and p2="${reciever}"  or p2 = "${sender}" and p1="${reciever}"`;
+		console.log(sql);
+		conn.query(sql, function(err, results) {
+			if (err) throw err;
+		});
+
+		
+		// console.log(sender);
+	})
 	//Verify Username
 	socket.on(VERIFY_USER, (nickname, callback)=>{
 		if(isUser(connectedUsers, nickname)){
 			callback({ isUser:true, user:null })
 		}else{
-			callback({ isUser:false, user:createUser({name:nickname, socketId:socket.id})})
-		}
+			var us = createUser({name:nickname, socketId:socket.id})
+			callback({ isUser:false, user:us})
+			
+			let sql = `select * from connection where p1 = "${nickname}" `;
+			console.log(sql);
+			var old_p1="";
+			conn.query(sql, function(err, results) {
+				if (err) throw err;
+				if(results.length>0){
+					
+				old_p1 = results[0].p1sid;
+				let sql = `update connection set p1sid = "${us.id}" where p1="${nickname}" `;
+				console.log(sql);
+				conn.query(sql, function(err, results) {
+					if (err) throw err;
+				});
+				 sql = `update message set sender = "${us.id}" where sender="${old_p1}"`;
+				 console.log(sql);
+				 conn.query(sql, function(err, results) {
+					if (err) throw err;
+				});
+				}
+			});
+			}
 	})
 
 	//User Connects with username
@@ -35,6 +111,7 @@ module.exports = function(socket){
 		socket.user = user
 
 		sendMessageToChatFromUser = sendMessageToChat(user.name)
+		sendMessageToChatFromOld = sendMessageToOld(user.name)
 		sendTypingFromUser = sendTypingToChat(user.name)
 
 		io.emit(USER_CONNECTED, connectedUsers)
@@ -81,18 +158,25 @@ module.exports = function(socket){
 				const newChat = createChat({ name:`${reciever}&${sender}`, users:[reciever, sender] })
 				socket.to(recieverSocket).emit(PRIVATE_MESSAGE, newChat)
 				socket.emit(PRIVATE_MESSAGE, newChat)
+				console.log("if đầu, new chat");
+				
 			}else{
 				if(!(reciever in activeChat.users)){
 					activeChat.users
 										.filter( user => user in connectedUsers)
 										.map( user => connectedUsers[user] )
 										.map( user => {
-												socket.to(user.socketId).emit(NEW_CHAT_USER, { chatId: activeChat.id, newUser: reciever })
+											socket.to(user.socketId).emit(NEW_CHAT_USER, { chatId: activeChat.id, newUser: reciever })
 										} )
 										socket.emit(NEW_CHAT_USER, { chatId: activeChat.id, newUser: reciever } )
+										console.log("if 2, new chat user");
+
 				}
 				socket.to(recieverSocket).emit(PRIVATE_MESSAGE, activeChat)
+				
+			
 			}
+			
 		}
 	})
 
@@ -117,6 +201,28 @@ function sendTypingToChat(user){
 */
 function sendMessageToChat(sender){
 	return (chatId, message)=>{
+		// let sql = `INSERT INTO message value ('',"${chatId}", "${message}","${sender}")`;
+		// console.log(sql);
+		// conn.query(sql, function(err, results) {
+		// 	if (err) throw err;
+		// });
+		let sql = "";
+		sql = `select * from connection where p1sid = "${chatId}" limit 1`;
+		console.log(sql);
+		//let sql = `INSERT INTO connection value ('',"${sender}", "${reciever}","${newChat.id}","${recieverSocket}")`;
+		console.log(sql);
+		conn.query(sql, function(err, results) {
+			if (err) throw err;
+			results.map((e) => {
+				let reciever = (sender === e.p1)? e.p2: e.p1
+				sql = `insert connection value ('',"${sender}","${reciever}","${chatId}","${message}")`
+				console.log(sql )
+				conn.query(sql, function(err, results) {
+					if (err) throw err;
+				});
+				//sendMessageToChat(reciever);
+			});
+		});
 		io.emit(`${MESSAGE_RECIEVED}-${chatId}`, createMessage({message, sender}))
 	}
 }
@@ -153,4 +259,9 @@ function removeUser(userList, username){
 */
 function isUser(userList, username){
   	return username in userList
+}
+function sendMessageToOld(sender){
+	return (chatId, message)=>{
+		io.emit(`${MESSAGE_RECIEVED}-${chatId}`, createMessage({message, sender}))
+	}
 }
