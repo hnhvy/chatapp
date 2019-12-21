@@ -7,7 +7,7 @@ import ChatHeading from './ChatHeading'
 import Messages from '../messages/Messages'
 import MessageInput from '../messages/MessageInput'
 import { values, difference, differenceBy } from 'lodash'
-
+import VideoCall from '../videoCall';
 export default class ChatContainer extends Component {
 	constructor(props) {
 	  super(props);	
@@ -57,6 +57,7 @@ export default class ChatContainer extends Component {
 	}
 	addUserToChat = ({ chatId, newUser }) => {
 		const { chats } = this.state
+		
 		const newChats = chats.map( chat => {
 			if(chat.id === chatId){
 				return Object.assign({}, chat, { users: [ ...chat.users, newUser ] })
@@ -199,8 +200,10 @@ export default class ChatContainer extends Component {
 								<Messages 
 									messages={activeChat.messages}
 									user={user}
+									activeChat = {activeChat}
 									typingUsers={activeChat.typingUsers}
 									/>
+										<VideoCall activeChat={activeChat} user={user}/>
 								<MessageInput 
 									sendMessage={
 										(message)=>{

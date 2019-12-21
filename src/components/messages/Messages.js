@@ -1,5 +1,6 @@
 import React , { Component} from 'react'
 
+
 export default class Messages extends React.Component {
 	constructor(props) {
 		super(props);
@@ -22,7 +23,7 @@ export default class Messages extends React.Component {
 		}
 
 	render() {
-		const { messages, user, typingUsers} = this.props
+		const { messages, user, typingUsers, activeChat} = this.props
 		return (
 			<div ref='container'
 				className="thread-container">
@@ -45,6 +46,8 @@ export default class Messages extends React.Component {
 						})	
 					
 					}
+				
+				
 					{
 						typingUsers.map((name)=>{
 							return(

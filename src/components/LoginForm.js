@@ -70,7 +70,7 @@ class LoginForm extends Component {
 					<label htmlFor="nickname">
 						<h2>Got a nickname?</h2>
 					</label>
-					{/* <input
+					<input
 						ref={input => {
 							this.textInput = input;
 						}}
@@ -79,7 +79,7 @@ class LoginForm extends Component {
 						value={nickname}
 						onChange={this.handleChange}
 						placeholder={'Username'}
-					/> */}
+					/>
 
 					{user ? (
 						<p>
