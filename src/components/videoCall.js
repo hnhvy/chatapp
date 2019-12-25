@@ -205,8 +205,8 @@ export default class VideoCall extends Component {
                 {/* {[1,2,3,4].map((userId) => {
                     return this.user.id !== userId ? <button key={userId} onClick={() => this.callTo(this.props.activeChat.id)}>Call {userId}</button> : null;
                 })} */}
-                {this.props.activeChat.id}
-                {this.props.user.id}
+                {/* {this.props.activeChat.id}
+                {this.props.user.id} */}
                 <div className="video-container">
                 <button  onClick={() =>  {
                     this.mediaHandler.getPermissions()
@@ -214,8 +214,7 @@ export default class VideoCall extends Component {
                         this.setState({hasMedia: true});
                         this.user.stream = stream;
                         const call = this.peer.call(this.other, stream);
-                        // console.log(call)
-
+                        console.log(call)
                         call.on('stream', (remoteStream) => {
                             this.setState({hasMedia: true});
                                 this.user.stream = remoteStream;
@@ -235,7 +234,7 @@ export default class VideoCall extends Component {
                         //     this.myVideo.src = URL.createObjectURL(stream);
                         // }
 
-                        this.myVideo.play();
+                        //this.myVideo.play();
                     });
                     
                     }}
@@ -258,9 +257,9 @@ export default class VideoCall extends Component {
             //                                             console.error('Failed to get local stream', err);
             //                                         })}}
                                                     >
-                                                       ahihi 
+                                                       Call 
                                                     </button> 
-                {this.state.otherUserId}
+                {/* {this.state.otherUserId} */}
                     <video className="my-video" ref={(ref) => {this.myVideo = ref;}}></video>
                     <video className="user-video" ref={(ref) => {this.userVideo = ref;}}></video>
                 </div>

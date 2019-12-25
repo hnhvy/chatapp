@@ -203,7 +203,7 @@ export default class ChatContainer extends Component {
 									activeChat = {activeChat}
 									typingUsers={activeChat.typingUsers}
 									/>
-										<VideoCall activeChat={activeChat} user={user}/>
+									
 								<MessageInput 
 									sendMessage={
 										(message)=>{

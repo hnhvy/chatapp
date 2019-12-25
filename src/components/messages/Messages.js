@@ -1,6 +1,6 @@
 import React , { Component} from 'react'
 
-
+import VideoCall from '../videoCall';
 export default class Messages extends React.Component {
 	constructor(props) {
 		super(props);
@@ -47,7 +47,7 @@ export default class Messages extends React.Component {
 					
 					}
 				
-				
+					<VideoCall activeChat={activeChat} user={user}/>	
 					{
 						typingUsers.map((name)=>{
 							return(
