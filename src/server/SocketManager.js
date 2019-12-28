@@ -1,4 +1,4 @@
-const io = require('./index.js').io
+﻿const io = require('./index.js').io
 
 const { VERIFY_USER, USER_CONNECTED, USER_DISCONNECTED, 
 		LOGOUT, COMMUNITY_CHAT, MESSAGE_RECIEVED, MESSAGE_SENT,
@@ -35,7 +35,6 @@ module.exports = function(socket){
 
 	let sendTypingFromUser;
 
-	
 	socket.on(OLD_MESSAGE, (active)=>{
 		console.log(active);
 		let sender = active.users[0];
@@ -94,11 +93,11 @@ module.exports = function(socket){
 				conn.query(sql, function(err, results) {
 					if (err) throw err;
 				});
-				 sql = `update message set sender = "${us.id}" where sender="${old_p1}"`;
+				/* sql = `update message set sender = "${us.id}" where sender="${old_p1}"`;
 				 console.log(sql);
 				 conn.query(sql, function(err, results) {
 					if (err) throw err;
-				});
+				});*/
 				}
 			});
 			}

@@ -10,7 +10,8 @@ export default class VideoCall extends Component {
 		super(props);
         this.state = {
             hasMedia: false,
-            otherUserId: null
+            otherUserId: null,
+            isCalling: false
         };
         this.other = "";
         this._isload = false
@@ -199,8 +200,9 @@ export default class VideoCall extends Component {
                 });
               });
         }
-        
+        const { isCalling } = this.state;
         return (
+           
             <div className="App">
                 {/* {[1,2,3,4].map((userId) => {
                     return this.user.id !== userId ? <button key={userId} onClick={() => this.callTo(this.props.activeChat.id)}>Call {userId}</button> : null;
@@ -209,6 +211,7 @@ export default class VideoCall extends Component {
                 {this.props.user.id} */}
                 <div className="video-container">
                 <button  onClick={() =>  {
+                    if(!isCalling){
                     this.mediaHandler.getPermissions()
                     .then((stream) => {
                         this.setState({hasMedia: true});
@@ -216,6 +219,7 @@ export default class VideoCall extends Component {
                         const call = this.peer.call(this.other, stream);
                         console.log(call)
                         call.on('stream', (remoteStream) => {
+                            this.setState({isCalling: true});
                             this.setState({hasMedia: true});
                                 this.user.stream = remoteStream;
                                 try {
@@ -237,7 +241,12 @@ export default class VideoCall extends Component {
                         //this.myVideo.play();
                     });
                     
-                    }}
+                    }else{
+                        this.peer.close();
+                        this.setState({isCalling: false});
+                    }
+                }
+                }
                      
             // navigator.mediaDevices.getUserMedia({video: true, audio: true}, (stream) => {
             //     console.log("any")
@@ -257,7 +266,7 @@ export default class VideoCall extends Component {
             //                                             console.error('Failed to get local stream', err);
             //                                         })}}
                                                     >
-                                                       Call 
+                                                       {!isCalling ? "Call":"End"} 
                                                     </button> 
                 {/* {this.state.otherUserId} */}
                     <video className="my-video" ref={(ref) => {this.myVideo = ref;}}></video>

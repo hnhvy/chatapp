@@ -46,7 +46,6 @@ export default class Messages extends React.Component {
 						})	
 					
 					}
-				
 					<VideoCall activeChat={activeChat} user={user}/>	
 					{
 						typingUsers.map((name)=>{
