@@ -11,12 +11,14 @@ import VideoCall from '../videoCall';
 export default class ChatContainer extends Component {
 	constructor(props) {
 	  super(props);	
-	
+	  this.openCall = false
 	  this.state = {
 		  chats:[],
 		  users:[],
-	  	activeChat:null
+		  activeChat:null,
+		 
 	  }
+	  
 	}
 
 	componentDidMount() {
@@ -73,6 +75,10 @@ export default class ChatContainer extends Component {
 				return Object.assign({}, chat, { users: newUsers })
 		})
 		this.setState({ chats: newChats })
+	}
+	onOpenCall(){
+		if(this.openCall) this.openCall = false
+		else this.openCall = true
 	}
 
 	/*
@@ -180,6 +186,7 @@ export default class ChatContainer extends Component {
 	render() {
 		const { user, logout } = this.props
 		const { chats, activeChat, users } = this.state
+	
 		return (
 			<div className="container">
 				<SideBar
@@ -196,11 +203,17 @@ export default class ChatContainer extends Component {
 						activeChat !== null ? (
 
 							<div className="chat-room">
-								<ChatHeading name={activeChat.name} />
+								<ChatHeading name={activeChat.name}
+									messages={activeChat.messages}
+									user={user}
+									onOpenCall = {()=>{this.openCall=!this.openCall}}
+									activeChat = {activeChat}
+									typingUsers={activeChat.typingUsers} />
 								<Messages 
 									messages={activeChat.messages}
 									user={user}
 									activeChat = {activeChat}
+									openCall = {this.openCall}
 									typingUsers={activeChat.typingUsers}
 									/>
 									

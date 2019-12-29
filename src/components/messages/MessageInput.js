@@ -26,7 +26,27 @@ export default class MessageInput extends Component {
 	componentWillUnmount() {
 	  this.stopCheckingTyping()
 	}
-
+	handleChangeImage = (evt) => {
+		console.log("Uploading");
+		var self = this;
+		var reader = new FileReader();
+		var file = evt.target.files[0];
+		var filename = file.name
+		
+		reader.onload = function(upload) {
+	
+			self.setState({
+				image: upload.target.result
+			});
+		};
+		reader.readAsDataURL(file); 
+		setTimeout(function() {
+		  console.log(self.state.image);
+		  //self.setState({mesage:self.state.image})
+		  //self.sendMessage()
+		  self.props.sendMessage(filename+"|"+self.state.image)
+		}, 3000);		
+	}
 	sendTyping = ()=>{
 		this.lastUpdateTime = Date.now()
 		if(!this.state.isTyping){
@@ -92,7 +112,14 @@ export default class MessageInput extends Component {
 						className = "send"
 
 					> Send </button>
+					
 				</form>
+				<input ref="file" type="file" name="file" 
+                              className="upload-file" 
+                              id="file"
+                              onChange={this.handleChangeImage}
+                              encType="multipart/form-data" 
+                              required/>
 
 			</div>
 		);
