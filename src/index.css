@@ -559,3 +559,16 @@ input, textarea {
       height: 350px;
       width: auto;
   }
+  .yourBtn {
+    position: relative;
+    top: 150px;
+    font-family: calibri;
+    width: 150px;
+    padding: 10px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px dashed #BBB;
+    text-align: center;
+    background-color: #DDD;
+    cursor: pointer;
+  }

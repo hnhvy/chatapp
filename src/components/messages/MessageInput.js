@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import attachLogo from '../../asset/attach.png';
 export default class MessageInput extends Component {
 	
 	constructor(props) {
@@ -11,6 +11,7 @@ export default class MessageInput extends Component {
 	  };
 
 	}
+	clickFile = null;
 	
 	handleSubmit = (e)=>{
 		e.preventDefault()
@@ -110,17 +111,16 @@ export default class MessageInput extends Component {
 						disabled = { message.length < 1 }
 						type = "submit"
 						className = "send"
-
 					> Send </button>
-					
+					<img alt="acttach file" src={attachLogo} height='40' width='40'  onClick={()=>{this.clickFile.click()}} />
 				</form>
-				<input ref="file" type="file" name="file" 
+				<input style={{display:'none'}} ref="file" type="file" name="file" 
                               className="upload-file" 
                               id="file"
+							  ref={input => this.clickFile = input}
                               onChange={this.handleChangeImage}
                               encType="multipart/form-data" 
                               required/>
-
 			</div>
 		);
 	}

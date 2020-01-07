@@ -1,9 +1,12 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React, { Component } from 'react';
 import MediaHandler from '../components/Call/MediaHandler';
 import Pusher from 'pusher-js';
 // import Peer from 'simple-peer';
 import Peer from 'peerjs';
-
+// import call from '../asset/'
+import Call from '../../src/asset/call.png'
+import End from '../../src/asset/end.png'
 export default class VideoCall extends Component {
 	constructor(props) {
 		super(props);
@@ -155,14 +158,18 @@ export default class VideoCall extends Component {
 
 	render() {
 		if (!this.props.activeChat.isCommunity && !this._isload) {
-			this.peer = new Peer(this.props.activeChat.id + this.user.name);
-			console.log(this.peer);
-			this.props.activeChat.users.map(e => {
-				this.other = e === this.user.name ? this.other : this.props.activeChat.id + e;
+			
+			var myid = "";
+			this.props.activeChat.users.map((e,i) => {
+				this.other = e === this.user.name ? this.other : this.props.activeChat.id + i;
+				myid = e !== this.user.name ? myid : this.props.activeChat.id + i;
 				// console.log(other)
+				console.log("PEERID", this.other)
 			});
-			console.log('MYID', this.props.activeChat.id + this.user.name);
-
+			
+			console.log('MYID', myid);
+			this.peer = new Peer(myid);
+			console.log(this.peer);
 			const conn = this.peer.connect(this.other);
 			conn.on('open', () => {
 				conn.send('hi!');
@@ -198,8 +205,12 @@ export default class VideoCall extends Component {
 							}
 							this.userVideo.play();
 						});
-						call.on('end', () => {
-							alert('Bố lượn nha');
+						call.on('close', () => {
+							if(stream)
+								stream.getTracks().forEach(function(track) {
+									track.stop();
+								});
+							this.setState({ isCalling: false });
 						});
 						try {
 							this.myVideo.srcObject = stream;
@@ -237,13 +248,13 @@ export default class VideoCall extends Component {
 							></video>
 						</div>
 
-						<button
-							onClick={() => {
-                                
+						<img width="100px" height="100px"
+							onClick={() => { 
 								if (!isCalling) {
+
 									this.mediaHandler.getPermissions().then(stream => {
 										this.setState({ hasMedia: true });
-										this.user.stream = stream;
+										this.user.mystream = stream;
 										const call = this.peer.call(this.other, stream);
 										console.log(call);
                                         this.call = call;
@@ -266,7 +277,16 @@ export default class VideoCall extends Component {
 											}
 										);
 										call.on('close', () => {
-											this.myVideo.stop();
+											if(this.user.stream)
+											this.user.stream.getTracks().forEach(function(track) {
+												track.stop();
+											});
+											if(this.user.mystream)
+											this.user.mystream.getTracks().forEach(function(track) {
+												track.stop();
+											});
+											this.setState({ isCalling: false });
+											// this.myVideo.stop();
 										});
 										try {
 											this.myVideo.srcObject = stream;
@@ -279,11 +299,13 @@ export default class VideoCall extends Component {
 									if(this.call)this.call.close();
                                     if(this.inComming) this.inComming.close()
 									this.setState({ isCalling: false });
+									if(this.user.mystream) this.user.mystream.getTracks().forEach(function(track) {
+												track.stop();
+											});
 								}
 							}}
-						>
-							{!isCalling ? 'Call' : 'End'}
-						</button>
+							src={!isCalling ? Call : End}
+					/>
 					</div>
 				) : (
 					''

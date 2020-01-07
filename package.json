@@ -6,6 +6,7 @@
     "@phanmn/simple-peer": "^9.1.4",
     "express": "^4.17.1",
     "firebase": "^7.5.0",
+    "https-localhost": "^4.4.1",
     "lodash": "^4.17.15",
     "mysql": "^2.17.1",
     "node-sass": "^4.13.0",

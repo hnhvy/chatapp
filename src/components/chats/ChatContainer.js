@@ -16,6 +16,7 @@ export default class ChatContainer extends Component {
 		  chats:[],
 		  users:[],
 		  activeChat:null,
+		  openCall:false
 		 
 	  }
 	  
@@ -185,7 +186,7 @@ export default class ChatContainer extends Component {
 	}
 	render() {
 		const { user, logout } = this.props
-		const { chats, activeChat, users } = this.state
+		const { chats, activeChat, users,openCall } = this.state
 	
 		return (
 			<div className="container">
@@ -201,19 +202,18 @@ export default class ChatContainer extends Component {
 				<div className="chat-room-container">
 					{
 						activeChat !== null ? (
-
 							<div className="chat-room">
 								<ChatHeading name={activeChat.name}
 									messages={activeChat.messages}
 									user={user}
-									onOpenCall = {()=>{this.openCall=!this.openCall}}
+									onOpenCall = {()=>{this.openCall=!this.openCall;this.setState({openCall:this.openCall});}}
 									activeChat = {activeChat}
 									typingUsers={activeChat.typingUsers} />
 								<Messages 
 									messages={activeChat.messages}
 									user={user}
 									activeChat = {activeChat}
-									openCall = {this.openCall}
+									openCall = {openCall}
 									typingUsers={activeChat.typingUsers}
 									/>
 									
