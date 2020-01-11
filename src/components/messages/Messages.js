@@ -30,14 +30,14 @@ export default class Messages extends React.Component {
 				className="thread-container">
 				<div className = "thread">
 				{
-					messages.map((mes, i)=>{
-						console.log(mes.message.length)
+					messages.map((mes, i)=>{					
 						return (
 							<div
 								key={mes.id}
 								className={`message-container ${mes.sender == user.name && 'right'}`}
 							>
-							{mes.message.includes("|") && base64regex.test(mes.message.split("|")[1].split(',')[1])?(
+							{(mes.message)?(
+							mes.message.includes("|") && base64regex.test(mes.message.split("|")[1].split(',')[1])?(
 								mes.message.split("|")[1].startsWith("data:image/")?
 								(<img className="mess-img" src = {mes.message.split("|")[1]}/>):
 								(
@@ -45,6 +45,14 @@ export default class Messages extends React.Component {
 								)
 								
 							):(
+								<Fragment>
+								<div className="time">{mes.time}</div>
+								<div className="data">
+									<div className="message">{mes.message}</div>
+									<div className="name">{mes.sender}</div>
+								</div>
+								</Fragment>)):
+								(
 								<Fragment>
 								<div className="time">{mes.time}</div>
 								<div className="data">

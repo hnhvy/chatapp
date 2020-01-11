@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import SideBar from '../sidebar/SideBar'
 import { COMMUNITY_CHAT, MESSAGE_SENT, MESSAGE_RECIEVED, 
 				TYPING, PRIVATE_MESSAGE, USER_CONNECTED, USER_DISCONNECTED,
-				NEW_CHAT_USER,OLD_MESSAGE } from '../../Events'
+				NEW_CHAT_USER,OLD_MESSAGE,OLD_LOADER, END_OLD_LOADER } from '../../Events'
 import ChatHeading from './ChatHeading'
 import Messages from '../messages/Messages'
 import MessageInput from '../messages/MessageInput'
 import { values, difference, differenceBy } from 'lodash'
-import VideoCall from '../videoCall';
 export default class ChatContainer extends Component {
 	constructor(props) {
 	  super(props);	
@@ -16,8 +15,8 @@ export default class ChatContainer extends Component {
 		  chats:[],
 		  users:[],
 		  activeChat:null,
-		  openCall:false
-		 
+		  openCall:false,
+		  isOldLoader:false
 	  }
 	  
 	}
@@ -56,7 +55,6 @@ export default class ChatContainer extends Component {
 		const { socket, user } = this.props
 		const { activeChat } = this.state
 		socket.emit(PRIVATE_MESSAGE, {reciever, sender:user.name, activeChat})
-
 	}
 	addUserToChat = ({ chatId, newUser }) => {
 		const { chats } = this.state
@@ -106,10 +104,29 @@ export default class ChatContainer extends Component {
 		this.setState({chats:newChats, activeChat:reset ? chat : this.state.activeChat})
 
 		const messageEvent = `${MESSAGE_RECIEVED}-${chat.id}`
+		
 		const typingEvent = `${TYPING}-${chat.id}`
-
 		socket.on(typingEvent, this.updateTypingInChat(chat.id))
 		socket.on(messageEvent, this.addMessageToChat(chat.id))
+		const oldLoaderEvent = `${OLD_LOADER}-${chat.id}`;
+		console.log(oldLoaderEvent)
+		let chatID = chat.id
+		socket.on(oldLoaderEvent, (message, sender)=>{
+			if(!this.state.isOldLoader){
+				console.log(message, sender)
+				const { chats } = this.state
+				let newChats = chats.map((chat)=>{
+					if(chat.id === chatID)
+						chat.messages.push(message)
+					return chat
+				})
+				this.setState({chats:newChats})}
+		});
+		const endOldEvt  =  `${END_OLD_LOADER}-${chat.id}` 
+		socket.on(endOldEvt, ()=>{
+			console.log("Chét clmm")
+			this.setState({isOldLoader: true});
+		});
 	}
 
 	/*
@@ -181,6 +198,8 @@ export default class ChatContainer extends Component {
 		const { socket } = this.props
 
 		socket.emit(OLD_MESSAGE,activeChat);
+		
+
 		if(activeChat.isCommunity)
 			activeChat.messages = ["cc"];
 	}

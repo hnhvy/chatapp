@@ -64,49 +64,7 @@ class LoginForm extends Component {
 		const { nickname, error } = this.state;
 		const { user, signOut, signInWithGoogle } = this.props;
 		return (
-			// <div className="login">
-			// 	<form onSubmit={this.handleSubmit} className="login-form">
-			// 		<label htmlFor="nickname">
-			// 			<h2>Got a nickname?</h2>
-			// 		</label>
-			// 		<input
-			// 			ref={input => {
-			// 				this.textInput = input;
-			// 			}}
-			// 			type="text"
-			// 			id="nickname"
-			// 			value={nickname}
-			// 			onChange={this.handleChange}
-			// 			placeholder={'Username'}
-			// 		/>
-			// 		{user ? (
-			// 			<p>
-			// 				Hello, {user.displayName}
-			// 				<button onClick={() => { this.addUid(user) }}>Continue to Chat</button>
-			// 			</p>
-			// 		) : (
-			// 				<p>Please sign in.</p>
-			// 			)}
-			// 		{user ? (
-			// 			<div className="google-btn"  onClick={signOut}>
-			// 			<div className="google-icon-wrapper">
-			// 				<img className="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" />
-			// 			</div>
-			// 			<p className="btn-text"><b>Sign in with google</b></p>
-			// 			</div>
-			// 		) : (
-			// 				// <button onClick={signInWithGoogle}>Sign in with Google</button>
-
-			// 			<div className="google-btn"  onClick={signInWithGoogle}>
-			// 			<div className="google-icon-wrapper">
-			// 				<img className="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" />
-			// 			</div>
-			// 			<p className="btn-text"><b>Sign in with google</b></p>
-			// 			</div>
-			// 			)}
-			// 		<div className="error">{error ? error : null}</div>
-			// 	</form>
-			// </div>
+			
 			<div className="limiter">
 				<div className="container-login100">
 					<div className="wrap-login100">
@@ -141,14 +99,14 @@ class LoginForm extends Component {
 									<button className="login100-form-btn">Login</button>
 								</div>
 							</div>
-							<div className="text-center p-t-115">
+							<div className=" p-t-115">
 							{user ? (
 			 			<p>
 			 				Hello, {user.displayName}
 			 				<button onClick={() => { this.addUid(user) }}>Continue to Chat</button>
 			 			</p>
 			 		) : (
-			 				<p>Please sign in.</p>
+			 				<p>Or login with.</p>
 			 			)}
 			 		{user ? (
 			 			<div className="google-btn"  onClick={signOut}>

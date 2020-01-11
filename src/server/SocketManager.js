@@ -2,7 +2,7 @@
 
 const { VERIFY_USER, USER_CONNECTED, USER_DISCONNECTED, 
 		LOGOUT, COMMUNITY_CHAT, MESSAGE_RECIEVED, MESSAGE_SENT,
-		TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER, OLD_MESSAGE  } = require('../Events')
+		TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER, OLD_MESSAGE, OLD_LOADER,END_OLD_LOADER} = require('../Events')
 
 const { createUser, createMessage, createChat } = require('../Factories')
 
@@ -32,6 +32,7 @@ module.exports = function(socket){
 
 	let sendMessageToChatFromUser;
 	let sendMessageToChatFromOld;
+	let sendEndOld;
 
 	let sendTypingFromUser;
 
@@ -53,21 +54,25 @@ module.exports = function(socket){
 			results.map((e) => {
 				let message = e.msg
 				let p1 = e.p1
-				// console.log(sender)
-				console.log(p1)
-				if(p1!==sender)
-				// console.log(e.msg )
-				io.emit(`${MESSAGE_RECIEVED}-${active.id}`, createMessage({message,p1}))
-				else
-				sendMessageToChatFromOld(active.id, message)
+				//console.log(sender)
+				// console.log(p1)
+				// if(p1!==sender)
+				 console.log(`${OLD_LOADER}-${active.id}`)
+				 io.emit(`${OLD_LOADER}-${active.id}`, createMessage({message, sender}))
+				// //io.emit(`${MESSAGE_RECIEVED}-${active.id}`, createMessage({message,p1}))
+				// else
+				//sendMessageToChatFromOld(active.id, message)
 				//sendMessageToChat(reciever);
 			});
+			io.emit(`${END_OLD_LOADER}-${active.id}`);
 		});
+		
 		 sql = `update connection set p1sid="${active.id}"  where p1 = "${sender}" and p2="${reciever}"  or p2 = "${sender}" and p1="${reciever}"`;
 		console.log(sql);
 		conn.query(sql, function(err, results) {
 			if (err) throw err;
 		});
+		// sendEndOld(active.id);
 
 		
 		// console.log(sender);
@@ -111,6 +116,7 @@ module.exports = function(socket){
 
 		sendMessageToChatFromUser = sendMessageToChat(user.name)
 		sendMessageToChatFromOld = sendMessageToOld(user.name)
+		sendEndOld = sendFinishOld(user.name)
 		sendTypingFromUser = sendTypingToChat(user.name)
 
 		io.emit(USER_CONNECTED, connectedUsers)
@@ -173,7 +179,6 @@ module.exports = function(socket){
 				}
 				socket.to(recieverSocket).emit(PRIVATE_MESSAGE, activeChat)
 				
-			
 			}
 			
 		}
@@ -261,6 +266,13 @@ function isUser(userList, username){
 }
 function sendMessageToOld(sender){
 	return (chatId, message)=>{
-		io.emit(`${MESSAGE_RECIEVED}-${chatId}`, createMessage({message, sender}))
+		io.emit(`${OLD_LOADER}-${chatId}`, createMessage({message, sender}))
 	}
+	
+}
+function sendFinishOld(sender){
+	return (chatId)=>{
+		io.emit(`${END_OLD_LOADER}-${chatId}`);
+	}
+	
 }
