@@ -572,3 +572,87 @@ input, textarea {
     background-color: #DDD;
     cursor: pointer;
   }
+  
+ .lighter{
+    font-weight: 100;
+  }
+  
+  *{box-sizing:border-box;}
+  
+  .btn-login{
+  /*    border: 1px solid red; */
+      cursor: pointer;
+  
+  }
+  .btn-google .line {
+    border: 1px solid #4285F4;
+  }
+  
+  .btn-facebook .line {
+    border: 1px solid #3b5998;
+  }
+  
+  .center-wrapper {
+    display: inline-block;
+    height: 3em;
+    width: 3em;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    background-color:#3b5998;
+    color:white;
+  }
+  
+  .google-color{
+    background-color:#4285F4;
+  }
+  
+  .p1{
+    padding-left:1rem;
+    margin-left:-0.22rem;
+    width:12rem;
+  }
+  
+  .centerV {
+    margin: 0;
+    padding:0;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%)
+  }
+  .centerHV {
+    margin: 0;
+    padding:0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%)
+  }
+  
+  .svg-wrap{
+    background-color:white;
+  }
+  
+  .btn-login{
+    width:17.3rem;
+    overflow:hidden;
+    padding:0;
+    margin:0;
+    margin-bottom:0.5rem;
+  }
+  
+  
+  /* 
+  
+  much easier with flexbox, if only...
+  .flex-container1 {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    width: 17rem;
+    padding: 0.05rem;
+    border: 1px solid grey; 
+    
+  } */
+  
