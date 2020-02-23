@@ -2,7 +2,7 @@
 
 const { VERIFY_USER, USER_CONNECTED, USER_DISCONNECTED, 
 		LOGOUT, COMMUNITY_CHAT, MESSAGE_RECIEVED, MESSAGE_SENT,
-		TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER, OLD_MESSAGE, OLD_LOADER,END_OLD_LOADER} = require('../Events')
+		TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER, OLD_MESSAGE, OLD_LOADER,END_OLD_LOADER,REGISTER} = require('../Events')
 
 const { createUser, createMessage, createChat } = require('../Factories')
 
@@ -78,36 +78,92 @@ module.exports = function(socket){
 		// console.log(sender);
 	})
 	//Verify Username
-	socket.on(VERIFY_USER, (nickname, callback)=>{
-		if(isUser(connectedUsers, nickname)){
-			callback({ isUser:true, user:null })
-		}else{
-			var us = createUser({name:nickname, socketId:socket.id})
-			callback({ isUser:false, user:us})
-			
-			let sql = `select * from connection where p1 = "${nickname}" `;
-			console.log(sql);
-			var old_p1="";
-			conn.query(sql, function(err, results) {
-				if (err) throw err;
-				if(results.length>0){
-					
-				old_p1 = results[0].p1sid;
-				let sql = `update connection set p1sid = "${us.id}" where p1="${nickname}" `;
-				console.log(sql);
+	socket.on(REGISTER, (nickname, password, callback)=>{
+		let sql = `select * from user where username = "${nickname}" and password = md5("${password}")`;
+		conn.query(sql, function(err, results) {
+			console.log(sql)
+			if (err) throw err;
+			if(results.length<1){
+				// callback({ isUser:false, user:null })
+				var us = createUser({name:nickname, socketId:socket.id})
+				callback({ isUser:false, user:us})
+				let sql = `insert into user value("","${nickname}",md5("${password}"),"")`;
 				conn.query(sql, function(err, results) {
 					if (err) throw err;
 				});
-				/* sql = `update message set sender = "${us.id}" where sender="${old_p1}"`;
-				 console.log(sql);
-				 conn.query(sql, function(err, results) {
+				sql = `select * from connection where p1 = "${nickname}" `;
+				console.log(sql);
+				var old_p1="";
+				conn.query(sql, function(err, results) {
 					if (err) throw err;
-				});*/
-				}
-			});
+					if(results.length>0){
+						
+					old_p1 = results[0].p1sid;
+					let sql = `update connection set p1sid = "${us.id}" where p1="${nickname}" `;
+					console.log(sql);
+					conn.query(sql, function(err, results) {
+						if (err) throw err;
+					});
+					/* sql = `update message set sender = "${us.id}" where sender="${old_p1}"`;
+					 console.log(sql);
+					 conn.query(sql, function(err, results) {
+						if (err) throw err;
+					});*/
+					}
+				});
+				
 			}
-	})
-
+			else{
+				console.log("wrong -_-");	
+			callback({ isUser:false, user:null })
+			}	
+		}
+	)
+	if(isUser(connectedUsers, nickname)){
+		callback({ isUser:true, user:null })
+	}
+});
+socket.on(VERIFY_USER, (nickname, password, callback)=>{
+		let sql = `select * from user where username = "${nickname}" and password = md5("${password}")`;
+		conn.query(sql, function(err, results) {
+			console.log(sql)
+			if (err) throw err;
+			if(results.length<1){
+				//callback({ isUser:false, user:null })
+			console.log("wrong -_-");	
+			callback({ isUser:false, user:null })
+			}
+			else{
+				var us = createUser({name:nickname, socketId:socket.id})
+				callback({ isUser:false, user:us})
+				
+				let sql = `select * from connection where p1 = "${nickname}" `;
+				console.log(sql);
+				var old_p1="";
+				conn.query(sql, function(err, results) {
+					if (err) throw err;
+					if(results.length>0){
+						
+					old_p1 = results[0].p1sid;
+					let sql = `update connection set p1sid = "${us.id}" where p1="${nickname}" `;
+					console.log(sql);
+					conn.query(sql, function(err, results) {
+						if (err) throw err;
+					});
+					/* sql = `update message set sender = "${us.id}" where sender="${old_p1}"`;
+					 console.log(sql);
+					 conn.query(sql, function(err, results) {
+						if (err) throw err;
+					});*/
+					}
+				});
+				}
+		}
+	)
+	if(isUser(connectedUsers, nickname)){
+		callback({ isUser:true, user:null })
+	}
+});
 	//User Connects with username
 	socket.on(USER_CONNECTED, (user)=>{
 		user.socketId = socket.id

@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { VERIFY_USER } from '../Events';
+import React, { Component, Fragment } from 'react';
+import { VERIFY_USER,REGISTER } from '../Events';
 import withFirebaseAuth from 'react-with-firebase-auth';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -26,6 +26,8 @@ class LoginForm extends Component {
 		this.state = {
 			nickname: '',
 			error: '',
+			password:'',
+			isRegister:false
 		};
 	}
 
@@ -33,22 +35,32 @@ class LoginForm extends Component {
 		if (isUser) {
 			this.setError('User name taken');
 		} else {
+			if(user===null){
+				this.setError("WRONG USERNAME OR PASS");
+			}
+			else{
 			this.setError('');
 			this.props.setUser(user);
+			}
 		}
 	};
 
 	handleSubmit = e => {
 		e.preventDefault();
 		const { socket } = this.props;
-		const { nickname } = this.state;
-		if (nickname) socket.emit(VERIFY_USER, nickname, this.setUser);
+		const { nickname, password, isRegister } = this.state;
+		if(isRegister){
+			socket.emit(REGISTER, nickname, password, this.setUser);	
+		}
+		if (nickname) socket.emit(VERIFY_USER, nickname, password, this.setUser);
 	};
 
 	handleChange = e => {
 		this.setState({ nickname: e.target.value });
 	};
-
+	handlePass = e =>{
+		this.setState({ password: e.target.value });
+	}
 	setError = error => {
 		this.setState({ error });
 	};
@@ -61,7 +73,7 @@ class LoginForm extends Component {
 		}
 	};
 	render() {
-		const { nickname, error } = this.state;
+		const { nickname, error, password, isRegister } = this.state;
 		const { user, signOut, signInWithGoogle } = this.props;
 		return (
 			<div className="limiter">
@@ -92,16 +104,18 @@ class LoginForm extends Component {
 									<i className="zmdi zmdi-eye" />
 								</span>
 								<input
-									className={nickname ? 'input100  has-val' : 'input100'}
+									className={password ? 'input100  has-val' : 'input100'}
 									type="password"
+									value = {password}
 									name="pass"
+									onChange={this.handlePass}
 								/>
 								<span className="focus-input100" data-placeholder="Password" />
 							</div>
 							<div className="container-login100-form-btn">
 								<div className="wrap-login100-form-btn">
 									<div className="login100-form-bgbtn" />
-									<button className="login100-form-btn">Login</button>
+									<button className="login100-form-btn">{isRegister?"Register":"Login"} </button>
 								</div>
 							</div>
 							<div className="text-center p-t-30">
@@ -117,7 +131,13 @@ class LoginForm extends Component {
 										</button>
 									</p>
 								) : (
+									<Fragment>
+									<p style={{fontSize:11}} onClick={()=>{
+										let sr = !isRegister
+											this.setState({'isRegister':sr})
+										}}>{isRegister?"Login":"Don't have account? Register"}</p>
 									<p>Or login with.</p>
+									</Fragment>
 								)}
 								{user ? (
 									<div className="btn-login btn-google" onClick={signOut}>
