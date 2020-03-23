@@ -642,7 +642,15 @@ input, textarea {
     margin-bottom:0.5rem;
   }
   
-  
+  .recolor{
+      background-color: #A64A85 !important;
+  }
+  .backrecolor{
+    background: pink !important;
+  }
+  .formrecolor{
+      background: white !important;
+  }
   /* 
   
   much easier with flexbox, if only...

@@ -77,8 +77,8 @@ class LoginForm extends Component {
 		const { user, signOut, signInWithGoogle } = this.props;
 		return (
 			<div className="limiter">
-				<div className="container-login100">
-					<div className="wrap-login100">
+				<div className={isRegister?"container-login100 backrecolor":"container-login100"}>
+					<div className={isRegister?"wrap-login100 formrecolor":"wrap-login100"}>
 						<form className="login100-form validate-form" onSubmit={this.handleSubmit}>
 							<span className="login100-form-title p-b-26">Welcome</span>
 							<span className="login100-form-title p-b-48">
@@ -114,8 +114,8 @@ class LoginForm extends Component {
 							</div>
 							<div className="container-login100-form-btn">
 								<div className="wrap-login100-form-btn">
-									<div className="login100-form-bgbtn" />
-									<button className="login100-form-btn">{isRegister?"Register":"Login"} </button>
+									<div className={isRegister?"login100-form-bgbtn recolor":"login100-form-bgbtn"}  />
+									<button className="login100-form-btn" >{isRegister?"Register":"Login"} </button>
 								</div>
 							</div>
 							<div className="text-center p-t-30">
@@ -132,7 +132,7 @@ class LoginForm extends Component {
 									</p>
 								) : (
 									<Fragment>
-									<p style={{fontSize:11}} onClick={()=>{
+									<p style={{fontSize:11}}  onClick={()=>{
 										let sr = !isRegister
 											this.setState({'isRegister':sr})
 										}}>{isRegister?"Login":"Don't have account? Register"}</p>
