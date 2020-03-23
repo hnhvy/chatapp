@@ -25,6 +25,7 @@ export default class VideoCall extends Component {
         this.call = null;
         this.inComming = null;
 
+
 		// this.setupPusher();
 		// this.callTo = this.callTo.bind(this);
 		// this.setupPusher = this.setupPusher.bind(this);
@@ -32,63 +33,7 @@ export default class VideoCall extends Component {
 	}
 
 	componentWillMount() {
-		// this.mediaHandler.getPermissions()
-		//     .then((stream) => {
-		//         this.setState({hasMedia: true});
-		//         this.user.stream = stream;
-		//         try {
-		//             this.myVideo.srcObject = stream;
-		//         } catch (e) {
-		//             this.myVideo.src = URL.createObjectURL(stream);
-		//         }
-		//         this.myVideo.play();
-		//     })
-		// if(!this.props.activeChat.isCommunity){
-		//     console.log(this.props.activeChat)
-		//     const peer = new Peer(this.props.activeChat.id + this.user.username);
-		//     var other = "";
-		//     this.props.activeChat.user.map( (e) => {
-		//         other = (e === this.user.username)?"":this.props.activeChat.id+e;
-		//     });
-		//     const conn = peer.connect(this.props.activeChat.id);
-		//     conn.on('open', () => {
-		//         conn.send('hi!');
-		//         console.log("Say hi")
-		//     });
-		//     peer.on('call', (call) => {
-		//         navigator.mediaDevices.getUserMedia({video: true, audio: true}, (stream) => {
-		//           call.answer(stream); // Answer the call with an A/V stream.
-		//           call.on('stream', (remoteStream) => {
-		//             // Show stream in some <video> element.
-		//             this.user.stream = remoteStream;
-		//                 try {
-		//                     this.userVideo.srcObject = remoteStream;
-		//                 } catch (e) {
-		//                     this.userVideo.src = URL.createObjectURL(remoteStream);
-		//                 }
-		//                 this.userVideo.play();
-		//           });
-		//         }, (err) => {
-		//           console.error('Failed to get local stream', err);
-		//         });
-		//       });
-		//     this.mediaHandler = new MediaHandler();
-		//     navigator.mediaDevices.getUserMedia({video: true, audio: false}, (stream) => {
-		//         const call = peer.call(other, stream);
-		//         call.on('stream', (remoteStream) => {
-		//             this.setState({hasMedia: true});
-		//                 this.user.stream = remoteStream;
-		//                 try {
-		//                     this.myVideo.srcObject = remoteStream;
-		//                 } catch (e) {
-		//                     this.myVideo.src = URL.createObjectURL(remoteStream);
-		//                 }
-		//                 this.myVideo.play();
-		//         });
-		//     }, (err) => {
-		//         console.error('Failed to get local stream', err);
-		//     });
-		// }
+		
 	}
 
 	setupPusher() {
@@ -155,6 +100,7 @@ export default class VideoCall extends Component {
 	callTo(userId) {
 		this.peers[userId] = this.startPeer(userId);
 	}
+
 
 	render() {
 		if (!this.props.activeChat.isCommunity && !this._isload) {

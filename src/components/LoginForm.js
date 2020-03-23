@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { VERIFY_USER,REGISTER } from '../Events';
+import { VERIFY_USER,REGISTER } from '../Events'; 
 import withFirebaseAuth from 'react-with-firebase-auth';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -30,40 +30,47 @@ class LoginForm extends Component {
 			isRegister:false
 		};
 	}
-
+//nhận dữ liệu lại từ server gửi về lúc đăng nhập
 	setUser = ({ user, isUser }) => {
+		//tk đã login
 		if (isUser) {
 			this.setError('User name taken');
+			//tk sai pass
 		} else {
 			if(user===null){
 				this.setError("WRONG USERNAME OR PASS");
 			}
+			//đưa user qua màn hình tt 
 			else{
 			this.setError('');
 			this.props.setUser(user);
 			}
 		}
 	};
-
+//
 	handleSubmit = e => {
 		e.preventDefault();
 		const { socket } = this.props;
 		const { nickname, password, isRegister } = this.state;
+		//dang ky
 		if(isRegister){
 			socket.emit(REGISTER, nickname, password, this.setUser);	
 		}
+		//dangnhap
 		if (nickname) socket.emit(VERIFY_USER, nickname, password, this.setUser);
 	};
-
+//lưu lại username với pass khi gõ vào state ở trên
 	handleChange = e => {
 		this.setState({ nickname: e.target.value });
 	};
 	handlePass = e =>{
 		this.setState({ password: e.target.value });
 	}
+	//thong bao loi
 	setError = error => {
 		this.setState({ error });
 	};
+	//khi bấm continue login  nếu lấy được user từ tk gg nó sẽ lấy info từ gg bở xuống state rồi gửi lên server để login
 	addUid = user => {
 		if (user) {
 			this.setState({ nickname: user.displayName });

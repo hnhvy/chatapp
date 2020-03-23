@@ -38,27 +38,31 @@ module.exports = function(socket){
 
 	socket.on(OLD_MESSAGE, (active)=>{
 		console.log(active);
+		// Lấy tin nhắn cũ từ database ra, dò theo userid? active chat (biến) lưu thông tin người đang chat với nhau,
+		// users trong active lưu dưới dạng mảng, lấy ra 0 với 1 nghĩa là id của 2 người đầu tiên
 		let sender = active.users[0];
-		let reciever = active.users[1];
+		let reciever = active.users[1]; 
+		//Câu sqllaays ra những message của 2 người (1)
 		let sql = `select * from connection where p1 = "${sender}" and p2="${reciever}" or p2 = "${sender}" and p1="${reciever}" `;
 		console.log(sql)
+
 		//let sql = `INSERT INTO connection value ('',"${sender}", "${reciever}","${newChat.id}","${recieverSocket}")`;
-		conn.query(sql, function(err, results) {
-			if (err) throw err;
-			if (results.length == 0 && !active.isCommunity){
+		conn.query(sql, function(err, results) {// Thực hiện câu sql ở trên
+			if (err) throw err; // Nếu lỗi thì hiển thị 
+			if (results.length == 0 && !active.isCommunity){ //Nếu chưa từng chat với nhau thì lưu câu user x đã kết nối với user y (2)
 				sql = `insert connection value ('',"${sender}","${reciever}","${active.id}","${sender} connected with ${reciever}")`
 				conn.query(sql, function(err, results) {
-					if (err) throw err;
+					if (err) throw err; 
 				});
 			}
-			results.map((e) => {
-				let message = e.msg
-				let p1 = e.p1
+			results.map((e) => { // Gửi lại message lấy được từ database về cho client
+				let message = e.msg // lấy message trong dâtbase 
+				let p1 = e.p1 // Lấy tên người gửi
 				//console.log(sender)
 				// console.log(p1)
 				// if(p1!==sender)
 				 console.log(`${OLD_LOADER}-${active.id}`)
-				 io.emit(`${OLD_LOADER}-${active.id}`, createMessage({message, sender}))
+				 io.emit(`${OLD_LOADER}-${active.id}`, createMessage({message, sender})) // Gửi về cho datataabasddeeer hiển thị
 				// //io.emit(`${MESSAGE_RECIEVED}-${active.id}`, createMessage({message,p1}))
 				// else
 				//sendMessageToChatFromOld(active.id, message)
@@ -83,7 +87,7 @@ module.exports = function(socket){
 		conn.query(sql, function(err, results) {
 			console.log(sql)
 			if (err) throw err;
-			if(results.length<1){
+			if(results.length<1){ 
 				// callback({ isUser:false, user:null })
 				var us = createUser({name:nickname, socketId:socket.id})
 				callback({ isUser:false, user:us})
@@ -91,6 +95,7 @@ module.exports = function(socket){
 				conn.query(sql, function(err, results) {
 					if (err) throw err;
 				});
+				// Cập nhật lại id theo socket id 
 				sql = `select * from connection where p1 = "${nickname}" `;
 				console.log(sql);
 				var old_p1="";
@@ -164,7 +169,7 @@ socket.on(VERIFY_USER, (nickname, password, callback)=>{
 		callback({ isUser:true, user:null })
 	}
 });
-	//User Connects with username
+	//User Connects with username 
 	socket.on(USER_CONNECTED, (user)=>{
 		user.socketId = socket.id
 		connectedUsers = addUser(connectedUsers, user)
