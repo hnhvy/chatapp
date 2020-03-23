@@ -1,6 +1,6 @@
 ﻿const io = require('./index.js').io
 
-const { VERIFY_USER, USER_CONNECTED, USER_DISCONNECTED, 
+const { VERIFY_USER, VERIFY_USER_GOOGLE, USER_CONNECTED, USER_DISCONNECTED, 
 		LOGOUT, COMMUNITY_CHAT, MESSAGE_RECIEVED, MESSAGE_SENT,
 		TYPING, PRIVATE_MESSAGE, NEW_CHAT_USER, OLD_MESSAGE, OLD_LOADER,END_OLD_LOADER,REGISTER} = require('../Events')
 
@@ -169,7 +169,39 @@ socket.on(VERIFY_USER, (nickname, password, callback)=>{
 		callback({ isUser:true, user:null })
 	}
 });
+<<<<<<< HEAD
 	//User Connects with username 
+=======
+socket.on(VERIFY_USER_GOOGLE, (nickname, callback)=>{
+	if(isUser(connectedUsers, nickname)){
+		callback({ isUser:true, user:null })
+	}else{
+		var us = createUser({name:nickname, socketId:socket.id})
+		callback({ isUser:false, user:us})
+		let sql = `select * from connection where p1 = "${nickname}" `;
+		console.log(sql);
+		var old_p1="";
+		conn.query(sql, function(err, results) {
+			if (err) throw err;
+			if(results.length>0){
+				
+			old_p1 = results[0].p1sid;
+			let sql = `update connection set p1sid = "${us.id}" where p1="${nickname}" `;
+			console.log(sql);
+			conn.query(sql, function(err, results) {
+				if (err) throw err;
+			});
+			/* sql = `update message set sender = "${us.id}" where sender="${old_p1}"`;
+			 console.log(sql);
+			 conn.query(sql, function(err, results) {
+				if (err) throw err;
+			});*/
+			}
+		});
+		}
+})
+	//User Connects with username
+>>>>>>> 0678733fe4b8e1a9204c7a5c9d984e4a51f46542
 	socket.on(USER_CONNECTED, (user)=>{
 		user.socketId = socket.id
 		connectedUsers = addUser(connectedUsers, user)

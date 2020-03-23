@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { VERIFY_USER,REGISTER } from '../Events'; 
+import { VERIFY_USER,REGISTER,VERIFY_USER_GOOGLE } from '../Events';
 import withFirebaseAuth from 'react-with-firebase-auth';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
@@ -76,7 +76,7 @@ class LoginForm extends Component {
 			this.setState({ nickname: user.displayName });
 			const { socket } = this.props;
 			const { nickname } = this.state;
-			if (nickname) socket.emit(VERIFY_USER, nickname, this.setUser);
+			if (nickname) socket.emit(VERIFY_USER_GOOGLE, nickname, this.setUser);
 		}
 	};
 	render() {

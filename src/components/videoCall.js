@@ -106,7 +106,8 @@ export default class VideoCall extends Component {
 		if (!this.props.activeChat.isCommunity && !this._isload) {
 			
 			var myid = "";
-			this.props.activeChat.users.map((e,i) => {
+			this.props.activeChat.users.map((e,i) => { // Lấy id của cá nhân trog cuộc trò chuyện, người đầu tiên id sẽ là id cuộc trò chuyện+0, người thứ 2 là id cuộc trò chuyện + 1
+				// Vì lúc gọi sẽ tìm theo id này, nên phải thống nhất chung id trong cuộc trò chuyện
 				this.other = e === this.user.name ? this.other : this.props.activeChat.id + i;
 				myid = e !== this.user.name ? myid : this.props.activeChat.id + i;
 				// console.log(other)
@@ -116,15 +117,15 @@ export default class VideoCall extends Component {
 			console.log('MYID', myid);
 			this.peer = new Peer(myid);
 			console.log(this.peer);
-			const conn = this.peer.connect(this.other);
+			const conn = this.peer.connect(this.other); //Tạo luồng kết nối đến người còn lại
 			conn.on('open', () => {
 				conn.send('hi!');
 				console.log('Say hi');
 			});
 			this._isload = true;
-			this.mediaHandler = new MediaHandler();
+			this.mediaHandler = new MediaHandler(); // Lấy quyền camera
 		}
-		if (this._isload) {
+		if (this._isload) { // Khởi động khi bấm nút camera trên thanh trên cùng ấy
 			this.peer.on('connection', conn => {
 				conn.on('data', data => {
 					// Will print 'hi!'
